@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Misc",
+  "FriendlyName": "BuyNow",
+  "SystemName": "Misc.BuyNow",
+  "Version": "1.01",
+  "SupportedVersions": [ "4.00" ],
+  "Author": "Kenan İLGÜN",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.Misc.BuyNow.dll",
+  "Description": "This plugin enables check and money order payments"
+}
