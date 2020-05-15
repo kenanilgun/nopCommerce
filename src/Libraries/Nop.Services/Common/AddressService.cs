@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Nop.Core.Caching;
 using Nop.Core.Domain.Common;
 using Nop.Data;
-using Nop.Services.Caching.CachingDefaults;
 using Nop.Services.Caching.Extensions;
 using Nop.Services.Directory;
 using Nop.Services.Events;
@@ -18,6 +18,7 @@ namespace Nop.Services.Common
         #region Fields
 
         private readonly AddressSettings _addressSettings;
+        private readonly CachingSettings _cachingSettings;
         private readonly IAddressAttributeParser _addressAttributeParser;
         private readonly IAddressAttributeService _addressAttributeService;
         private readonly ICountryService _countryService;
@@ -30,6 +31,7 @@ namespace Nop.Services.Common
         #region Ctor
 
         public AddressService(AddressSettings addressSettings,
+            CachingSettings cachingSettings,
             IAddressAttributeParser addressAttributeParser,
             IAddressAttributeService addressAttributeService,
             ICountryService countryService,
@@ -38,6 +40,7 @@ namespace Nop.Services.Common
             IStateProvinceService stateProvinceService)
         {
             _addressSettings = addressSettings;
+            _cachingSettings = cachingSettings;
             _addressAttributeParser = addressAttributeParser;
             _addressAttributeService = addressAttributeService;
             _countryService = countryService;
@@ -95,6 +98,7 @@ namespace Nop.Services.Common
             var query = from a in _addressRepository.Table
                         where a.StateProvinceId == stateProvinceId
                         select a;
+
             return query.Count();
         }
 
@@ -107,10 +111,8 @@ namespace Nop.Services.Common
         {
             if (addressId == 0)
                 return null;
-
-            var key = string.Format(NopCommonCachingDefaults.AddressesByIdCacheKey, addressId);
-
-            return _addressRepository.ToCachedGetById(addressId, key);
+            
+            return _addressRepository.ToCachedGetById(addressId, _cachingSettings.ShortTermCacheTime);
         }
 
         /// <summary>

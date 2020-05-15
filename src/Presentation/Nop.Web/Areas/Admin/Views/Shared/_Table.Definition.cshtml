@@ -80,6 +80,9 @@
 }
 else
 {
+    //check using MasterCheckBox
+    var isMasterCheckBoxUsed = Model.ColumnCollection.Any(x => x.IsMasterCheckBox);
+
     <text>
     ajax:
     {
@@ -87,6 +90,14 @@ else
         type: "@WebRequestMethods.Http.Post",
         dataType: "json",
         dataSrc: "Data",
+        beforeSend: function() {
+        @if (isMasterCheckBoxUsed)
+        {
+            <text>
+            clearMasterCheckbox();
+            </text>
+        }
+        },
         data: function(data) {
             @if (Model.Filters != null)
             {
@@ -174,7 +185,18 @@ ordering: @Model.Ordering.ToString().ToLower(),
             name: 'refresh',
             text: '<i class="fa fa-refresh" style="padding-left: 5px"></i>',
             action: function () {
-                updateTable('#@Model.Name');
+                @if (Model.ServerSide)
+                {
+                    <text>
+                    updateTable('#@Model.Name');
+                    </text>
+                }
+                else
+                {
+                    <text>
+                    updateTableSrc('#@Model.Name');
+                    </text>
+                }
             }
         }],
     </text>
@@ -343,7 +365,7 @@ columns: [
                 case RenderCheckBox checkBox:
                     <text>
                     render: function (data, type, row, meta) {
-                        return (data == true)
+                        return (data === true)
                             ? '<input name="@checkBox.Name" value="' + row.@checkBox.PropertyKeyName + '" type="checkbox" class="checkboxGroups" checked="checked" />'
                             : '<input name="@checkBox.Name" value="' + row.@checkBox.PropertyKeyName + '" type="checkbox" class="checkboxGroups" />';
                     },

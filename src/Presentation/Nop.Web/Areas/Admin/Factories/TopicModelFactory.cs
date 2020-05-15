@@ -104,18 +104,11 @@ namespace Nop.Web.Areas.Admin.Factories
 
             //get topics
             var topics = _topicService.GetAllTopics(showHidden: true,
+                keywords: searchModel.SearchKeywords,
                 storeId: searchModel.SearchStoreId,
                 ignorAcl: true);
 
-            //filter topics
-            //TODO: move filter to topic service
-            if (!string.IsNullOrEmpty(searchModel.SearchKeywords))
-            {
-                topics = topics.Where(topic => (topic.Title?.Contains(searchModel.SearchKeywords) ?? false) ||
-                                               (topic.Body?.Contains(searchModel.SearchKeywords) ?? false)).ToList();
-            }
-
-            var pagedTopics = topics.ToList().ToPagedList(searchModel);
+            var pagedTopics = topics.ToPagedList(searchModel);
 
             //prepare grid model
             var model = new TopicListModel().PrepareToGrid(searchModel, pagedTopics, () =>
@@ -129,6 +122,11 @@ namespace Nop.Web.Areas.Admin.Factories
                     topicModel.Body = string.Empty;
 
                     topicModel.SeName = _urlRecordService.GetSeName(topic, 0, true, false);
+
+                    if (!string.IsNullOrEmpty(topicModel.SystemName))
+                        topicModel.TopicName = topicModel.SystemName;
+                    else
+                        topicModel.TopicName = topicModel.Title;
 
                     return topicModel;
                 });
